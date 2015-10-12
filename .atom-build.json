@@ -1,0 +1,5 @@
+{
+  "cmd": "javac",
+  "args": [ "src/main.java" ],
+  "sh": false
+}
