@@ -1,5 +1,11 @@
 {
   "cmd": "javac",
-  "args": [ "src/main.java" ],
+  "args": [
+    "-d",
+    "class",
+    "-cp",
+    "src",
+    "src/main.java"
+  ],
   "sh": false
 }
