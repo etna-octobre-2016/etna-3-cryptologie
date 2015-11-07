@@ -19,18 +19,17 @@ public class DESAlgorithm
     };
 
     ////////////////////////////////////////////////////////////////////////
-    // CONSTRUCTORS
-    ////////////////////////////////////////////////////////////////////////
-
-    public DESAlgorithm()
-    {
-        System.out.println("des instanciation");
-    }
-
-    ////////////////////////////////////////////////////////////////////////
     // PUBLIC STATIC METHODS
     ////////////////////////////////////////////////////////////////////////
 
+    public static String DESdecrypt(String message, String key)
+    {
+        return "toto";
+    }
+    public static String DESencrypt(String message, String key)
+    {
+        return "toto";
+    }
     public static String KeySchedule(String key, Integer round)
     {
         System.out.println(key);
@@ -42,10 +41,6 @@ public class DESAlgorithm
     // PRIVATE STATIC METHODS
     ////////////////////////////////////////////////////////////////////////
 
-    private static byte[] stringToBinary(String str)
-    {
-        return str.getBytes();
-    }
     private static void printBinary(byte[] binaryData)
     {
         String          byteString;
@@ -62,5 +57,9 @@ public class DESAlgorithm
             output.append(" ");
         }
         System.out.println(output.toString());
+    }
+    private static byte[] stringToBinary(String str)
+    {
+        return str.getBytes();
     }
 }
