@@ -3,6 +3,10 @@ package etna.crypt.algorithms;
 import java.lang.*;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
+import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
+import org.apache.commons.lang3.*;
 
 public class DESAlgorithm
 {
@@ -20,6 +24,7 @@ public class DESAlgorithm
         {63, 55, 47, 39, 31, 23, 15, 7}
     };
     private static int VALID_KEY_NUMBER_OF_BYTES = 8;
+    private static int VALID_MESSAGE_MAX_NUMBER_OF_BYTES = 8;
 
     ////////////////////////////////////////////////////////////////////////
     // PUBLIC STATIC METHODS
@@ -32,11 +37,18 @@ public class DESAlgorithm
     public static String DESencrypt(String message, String key) throws DESAlgorithmException
     {
         byte[] binaryKey;
+        byte[] binaryMessage;
 
         binaryKey = stringToBinary(key);
+        binaryMessage = stringToBinary(message);
         validateKey(binaryKey);
-        System.out.println(key);
-        KeySchedule(binaryKey, 16);
+        validateMessage(binaryMessage);
+        printBinary(binaryMessage);
+        if (binaryMessage.length < VALID_MESSAGE_MAX_NUMBER_OF_BYTES)
+        {
+            binaryMessage = padBinaryNumber(binaryMessage, VALID_MESSAGE_MAX_NUMBER_OF_BYTES);
+        }
+        printBinary(binaryMessage);
         return "toto";
     }
 
@@ -64,17 +76,37 @@ public class DESAlgorithm
         );
         return binaryKey;
     }
+    private static byte[] padBinaryNumber(byte[] number, int maxLength)
+    {
+        List<Byte>  bytesFixedList;
+        List<Byte>  bytesList;
+        int         numberOfBytes;
+
+        bytesFixedList = Arrays.asList(ArrayUtils.toObject(number));
+        bytesList = new ArrayList<Byte>(bytesFixedList);
+        numberOfBytes = number.length;
+        while (numberOfBytes < maxLength)
+        {
+            bytesList.add(0, new Byte("0"));
+            numberOfBytes++;
+        }
+        return ArrayUtils.toPrimitive(bytesList.toArray(new Byte[numberOfBytes]));
+    }
     private static void printBinary(byte[] binaryData)
     {
+        int             byteStringLength;
         String          byteString;
-        StringBuilder   output = new StringBuilder();
+        StringBuilder   output;
 
+        output = new StringBuilder();
         for (byte b : binaryData)
         {
             byteString = Integer.toBinaryString(b);
-            if (byteString.length() < 8)
+            byteStringLength = byteString.length();
+            while (byteStringLength < 8)
             {
                 byteString = "0" + byteString;
+                byteStringLength++;
             }
             output.append(byteString);
             output.append(" ");
@@ -93,6 +125,17 @@ public class DESAlgorithm
         if (numberOfBytes != VALID_KEY_NUMBER_OF_BYTES)
         {
             throw new DESAlgorithmException("Invalid key provided. Must be a " + (VALID_KEY_NUMBER_OF_BYTES * 8) + " bits key.");
+        }
+        return true;
+    }
+    private static boolean validateMessage(byte[] binaryMessage) throws DESAlgorithmException
+    {
+        int numberOfBytes;
+
+        numberOfBytes = binaryMessage.length;
+        if (numberOfBytes > VALID_MESSAGE_MAX_NUMBER_OF_BYTES)
+        {
+            throw new DESAlgorithmException("Invalid message provided. Must be a " + (VALID_MESSAGE_MAX_NUMBER_OF_BYTES * 8) + " bits message or less.");
         }
         return true;
     }
