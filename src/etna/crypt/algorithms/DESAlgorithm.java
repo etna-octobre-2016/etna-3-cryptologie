@@ -1,6 +1,7 @@
 package etna.crypt.algorithms;
 
 import java.lang.*;
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Arrays;
@@ -112,6 +113,24 @@ public class DESAlgorithm
             output.append(" ");
         }
         System.out.println(output.toString());
+    }
+    private static byte[] shiftBinary(byte[] bytes, int count, int maxLength)
+    {
+        byte[]      result;
+        BigInteger  number;
+
+        number = new BigInteger(bytes);
+        number = (count < 0) ? number.shiftRight(-count) : number.shiftLeft(count);
+        result = number.toByteArray();
+        if (result.length < maxLength)
+        {
+            return padBinaryNumber(result, maxLength);
+        }
+        return result;
+    }
+    private static byte[] shiftBinary(byte[] bytes, int count)
+    {
+        return shiftBinary(bytes, count, -1);
     }
     private static byte[] stringToBinary(String str)
     {
