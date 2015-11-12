@@ -104,6 +104,10 @@ public class DESAlgorithm
         }
         return byteString;
     }
+    private static int calculateBitRelativeIndex(byte[] bytes, int absoluteIndex) throws DESAlgorithmException
+    {
+        return absoluteIndex % bytes.length;
+    }
     private static int calculateByteIndex(byte[] bytes, int bitIndex) throws DESAlgorithmException
     {
         int byteIndex;
