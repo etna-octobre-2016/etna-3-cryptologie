@@ -44,13 +44,24 @@ public class DESAlgorithm
         binaryMessage = stringToBinary(message);
         validateKey(binaryKey);
         validateMessage(binaryMessage);
-        printBinary(binaryMessage);
-        if (binaryMessage.length < VALID_MESSAGE_MAX_NUMBER_OF_BYTES)
-        {
-            binaryMessage = padBinaryNumber(binaryMessage, VALID_MESSAGE_MAX_NUMBER_OF_BYTES);
-        }
-        printBinary(binaryMessage);
+        binaryMessage = padBinaryNumber(binaryMessage, VALID_MESSAGE_MAX_NUMBER_OF_BYTES);
+        System.out.println(binaryToString(binaryMessage));
+        binaryMessage = swapBits(binaryMessage, 0, 16);
+        System.out.println(binaryToString(binaryMessage));
         return "toto";
+    }
+    public static byte[] KeySchedule(byte[] binaryKey, Integer round)
+    {
+        System.out.println("nombre d'octets: " + binaryKey.length);
+        System.out.println("nombre de bits: " + (binaryKey.length * 8));
+        System.out.println(binaryToString(binaryKey));
+        System.out.println(Long.toHexString(
+                binaryToLong(
+                    binaryKey
+                )
+            )
+        );
+        return binaryKey;
     }
 
     ////////////////////////////////////////////////////////////////////////
@@ -64,18 +75,53 @@ public class DESAlgorithm
         buffer = ByteBuffer.wrap(binaryData);
         return buffer.getLong();
     }
-    private static byte[] KeySchedule(byte[] binaryKey, Integer round)
+    private static String binaryToString(byte[] binaryData)
     {
-        System.out.println("nombre d'octets: " + binaryKey.length);
-        System.out.println("nombre de bits: " + (binaryKey.length * 8));
-        printBinary(binaryKey);
-        System.out.println(Long.toHexString(
-                binaryToLong(
-                    binaryKey
-                )
-            )
-        );
-        return binaryKey;
+        StringBuilder output;
+
+        output = new StringBuilder();
+        for (byte b : binaryData)
+        {
+
+            output.append(byteToString(b));
+            output.append(" ");
+        }
+        return output.toString();
+    }
+    private static String byteToString(byte b)
+    {
+        int     byteStringLength;
+        String  byteString;
+
+        byteString = Integer.toBinaryString(b);
+        byteStringLength = byteString.length();
+        while (byteStringLength < 8)
+        {
+            byteString = "0" + byteString;
+            byteStringLength++;
+        }
+        return byteString;
+    }
+    private static int calculateByteIndex(byte[] bytes, int bitIndex) throws DESAlgorithmException
+    {
+        int byteIndex;
+        int maxByteIndex;
+
+        byteIndex = bytes.length - 1 - (int)Math.floor(bitIndex / 8);
+        maxByteIndex = bytes.length - 1;
+        if (byteIndex < 0 || byteIndex > maxByteIndex)
+        {
+            throw new DESAlgorithmException("byte not found for bit index " + bitIndex);
+        }
+        return byteIndex;
+    }
+    private static byte findByte(byte[] bytes, int bitIndex) throws DESAlgorithmException
+    {
+        int byteIndex;
+
+        byteIndex = calculateByteIndex(bytes, bitIndex);
+        System.out.println("byteIndex for bit " + bitIndex + ": " + byteIndex);
+        return bytes[byteIndex];
     }
     private static byte[] padBinaryNumber(byte[] number, int maxLength)
     {
@@ -92,27 +138,6 @@ public class DESAlgorithm
             numberOfBytes++;
         }
         return ArrayUtils.toPrimitive(bytesList.toArray(new Byte[numberOfBytes]));
-    }
-    private static void printBinary(byte[] binaryData)
-    {
-        int             byteStringLength;
-        String          byteString;
-        StringBuilder   output;
-
-        output = new StringBuilder();
-        for (byte b : binaryData)
-        {
-            byteString = Integer.toBinaryString(b);
-            byteStringLength = byteString.length();
-            while (byteStringLength < 8)
-            {
-                byteString = "0" + byteString;
-                byteStringLength++;
-            }
-            output.append(byteString);
-            output.append(" ");
-        }
-        System.out.println(output.toString());
     }
     private static byte[] shiftBinary(byte[] bytes, int count, int maxLength)
     {
@@ -135,6 +160,17 @@ public class DESAlgorithm
     private static byte[] stringToBinary(String str)
     {
         return str.getBytes(Charset.forName("UTF-8"));
+    }
+    private static byte[] swapBits(byte[] bytes, int bit1Index, int bit2Index) throws DESAlgorithmException
+    {
+        byte byte1;
+        byte byte2;
+
+        byte1 = findByte(bytes, bit1Index);
+        byte2 = findByte(bytes, bit2Index);
+        System.out.println("byte1: " + byteToString(byte1));
+        System.out.println("byte2: " + byteToString(byte2));
+        return bytes;
     }
     private static boolean validateKey(byte[] binaryKey) throws DESAlgorithmException
     {
