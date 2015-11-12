@@ -44,10 +44,12 @@ public class DESAlgorithm
         binaryMessage = stringToBinary(message);
         validateKey(binaryKey);
         validateMessage(binaryMessage);
+
         binaryMessage = padBinaryNumber(binaryMessage, VALID_MESSAGE_MAX_NUMBER_OF_BYTES);
         System.out.println(binaryToString(binaryMessage));
         binaryMessage = swapBits(binaryMessage, 0, 16);
         System.out.println(binaryToString(binaryMessage));
+
         return "toto";
     }
     public static byte[] KeySchedule(byte[] binaryKey, Integer round)
@@ -120,7 +122,6 @@ public class DESAlgorithm
         int byteIndex;
 
         byteIndex = calculateByteIndex(bytes, bitIndex);
-        System.out.println("byteIndex for bit " + bitIndex + ": " + byteIndex);
         return bytes[byteIndex];
     }
     private static byte[] padBinaryNumber(byte[] number, int maxLength)
