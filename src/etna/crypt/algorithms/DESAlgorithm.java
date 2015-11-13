@@ -15,7 +15,7 @@ public class DESAlgorithm
     ////////////////////////////////////////////////////////////////////////
     // CONSTANTS
     ////////////////////////////////////////////////////////////////////////
-    private static int IP_TABLE[][] = {
+    private static int          IP_TABLE[][] = {
         {58, 50, 42, 34, 26, 18, 10, 2},
         {60, 52, 44, 36, 28, 20, 12, 4},
         {62, 54, 46, 38, 30, 22, 14, 6},
@@ -25,18 +25,18 @@ public class DESAlgorithm
         {61, 53, 45, 37, 29, 21, 13, 5},
         {63, 55, 47, 39, 31, 23, 15, 7}
     };
-    private static int VALID_KEY_NUMBER_OF_BYTES = 8;
-    private static int VALID_MESSAGE_MAX_NUMBER_OF_BYTES = 8;
+    private static int          VALID_KEY_NUMBER_OF_BYTES = 8;
+    private static int          VALID_MESSAGE_MAX_NUMBER_OF_BYTES = 8;
 
     ////////////////////////////////////////////////////////////////////////
     // PUBLIC STATIC METHODS
     ////////////////////////////////////////////////////////////////////////
 
-    public static String DESdecrypt(String message, String key)
+    public static String        DESdecrypt(String message, String key)
     {
         return "toto";
     }
-    public static String DESencrypt(String message, String key) throws DESAlgorithmException
+    public static String        DESencrypt(String message, String key) throws DESAlgorithmException
     {
         byte[] binaryKey;
         byte[] binaryMessage;
@@ -53,7 +53,7 @@ public class DESAlgorithm
 
         return "toto";
     }
-    public static byte[] KeySchedule(byte[] binaryKey, Integer round)
+    public static byte[]        KeySchedule(byte[] binaryKey, Integer round)
     {
         System.out.println("nombre d'octets: " + binaryKey.length);
         System.out.println("nombre de bits: " + (binaryKey.length * 8));
@@ -71,14 +71,14 @@ public class DESAlgorithm
     // PRIVATE STATIC METHODS
     ////////////////////////////////////////////////////////////////////////
 
-    private static long binaryToLong(byte[] binaryData)
+    private static long         binaryToLong(byte[] binaryData)
     {
         ByteBuffer buffer;
 
         buffer = ByteBuffer.wrap(binaryData);
         return buffer.getLong();
     }
-    private static String binaryToString(byte[] binaryData)
+    private static String       binaryToString(byte[] binaryData)
     {
         StringBuilder output;
 
@@ -91,7 +91,7 @@ public class DESAlgorithm
         }
         return output.toString();
     }
-    private static String byteToString(byte b)
+    private static String       byteToString(byte b)
     {
         int     byteStringLength;
         String  byteString;
@@ -105,11 +105,11 @@ public class DESAlgorithm
         }
         return byteString;
     }
-    private static int calculateBitRelativeIndex(byte[] bytes, int absoluteIndex) throws DESAlgorithmException
+    private static int          calculateBitRelativeIndex(byte[] bytes, int absoluteIndex) throws DESAlgorithmException
     {
         return 7 - (int)Math.floor(absoluteIndex % bytes.length);
     }
-    private static int calculateByteIndex(byte[] bytes, int bitIndex) throws DESAlgorithmException
+    private static int          calculateByteIndex(byte[] bytes, int bitIndex) throws DESAlgorithmException
     {
         int byteIndex;
         int maxByteIndex;
@@ -122,14 +122,14 @@ public class DESAlgorithm
         }
         return byteIndex;
     }
-    private static byte findByte(byte[] bytes, int bitIndex) throws DESAlgorithmException
+    private static byte         findByte(byte[] bytes, int bitIndex) throws DESAlgorithmException
     {
         int byteIndex;
 
         byteIndex = calculateByteIndex(bytes, bitIndex);
         return bytes[byteIndex];
     }
-    private static byte[] padBinaryNumber(byte[] number, int maxLength)
+    private static byte[]       padBinaryNumber(byte[] number, int maxLength)
     {
         List<Byte>  bytesFixedList;
         List<Byte>  bytesList;
@@ -145,7 +145,7 @@ public class DESAlgorithm
         }
         return ArrayUtils.toPrimitive(bytesList.toArray(new Byte[numberOfBytes]));
     }
-    private static byte[] shiftBinary(byte[] bytes, int count, int maxLength)
+    private static byte[]       shiftBinary(byte[] bytes, int count, int maxLength)
     {
         byte[]      result;
         BigInteger  number;
@@ -159,15 +159,15 @@ public class DESAlgorithm
         }
         return result;
     }
-    private static byte[] shiftBinary(byte[] bytes, int count)
+    private static byte[]       shiftBinary(byte[] bytes, int count)
     {
         return shiftBinary(bytes, count, -1);
     }
-    private static byte[] stringToBinary(String str)
+    private static byte[]       stringToBinary(String str)
     {
         return str.getBytes(Charset.forName("UTF-8"));
     }
-    private static byte[] swapBits(byte[] bytes, int bit1Index, int bit2Index) throws DESAlgorithmException
+    private static byte[]       swapBits(byte[] bytes, int bit1Index, int bit2Index) throws DESAlgorithmException
     {
         char            bit1Value;
         char            bit2Value;
@@ -197,7 +197,7 @@ public class DESAlgorithm
         bytes[byte2Index] = Byte.parseByte(byte2.toString(), 2);
         return bytes;
     }
-    private static boolean validateKey(byte[] binaryKey) throws DESAlgorithmException
+    private static boolean      validateKey(byte[] binaryKey) throws DESAlgorithmException
     {
         int numberOfBytes;
 
@@ -208,7 +208,7 @@ public class DESAlgorithm
         }
         return true;
     }
-    private static boolean validateMessage(byte[] binaryMessage) throws DESAlgorithmException
+    private static boolean      validateMessage(byte[] binaryMessage) throws DESAlgorithmException
     {
         int numberOfBytes;
 
