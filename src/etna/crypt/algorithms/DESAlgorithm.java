@@ -1,7 +1,6 @@
 package etna.crypt.algorithms;
 
 import java.lang.*;
-import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Arrays;
@@ -50,6 +49,8 @@ public class DESAlgorithm
         System.out.println(binaryToString(binaryMessage));
         binaryMessage = swapBits(binaryMessage, 0, 24);
         System.out.println(binaryToString(binaryMessage));
+        binaryMessage = shiftBinary(binaryMessage, 8);
+        System.out.println(binaryToString(binaryMessage));
 
         return "toto";
     }
@@ -94,9 +95,11 @@ public class DESAlgorithm
     private static String       byteToString(byte b)
     {
         int     byteStringLength;
+        long    number;
         String  byteString;
 
-        byteString = Integer.toBinaryString(b);
+        number = Byte.toUnsignedLong(b);
+        byteString = Long.toUnsignedString(number, 2);
         byteStringLength = byteString.length();
         while (byteStringLength < 8)
         {
@@ -145,23 +148,17 @@ public class DESAlgorithm
         }
         return ArrayUtils.toPrimitive(bytesList.toArray(new Byte[numberOfBytes]));
     }
-    private static byte[]       shiftBinary(byte[] bytes, int count, int maxLength)
-    {
-        byte[]      result;
-        BigInteger  number;
-
-        number = new BigInteger(bytes);
-        number = (count < 0) ? number.shiftRight(-count) : number.shiftLeft(count);
-        result = number.toByteArray();
-        if (result.length < maxLength)
-        {
-            return padBinaryNumber(result, maxLength);
-        }
-        return result;
-    }
     private static byte[]       shiftBinary(byte[] bytes, int count)
     {
-        return shiftBinary(bytes, count, -1);
+        long        number;
+        long        shiftedNumber;
+        ByteBuffer  buffer;
+
+        number = binaryToLong(bytes);
+        shiftedNumber = (count < 0) ? number >> (-count) : number << count;
+        buffer = ByteBuffer.allocate(bytes.length);
+        buffer.putLong(shiftedNumber);
+        return buffer.array();
     }
     private static byte[]       stringToBinary(String str)
     {
