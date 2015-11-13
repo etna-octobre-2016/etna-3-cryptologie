@@ -6,8 +6,9 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.List;
-import org.apache.commons.lang3.*;
+import org.apache.commons.lang3.ArrayUtils;
 
 public class DESAlgorithm
 {
@@ -47,7 +48,7 @@ public class DESAlgorithm
 
         binaryMessage = padBinaryNumber(binaryMessage, VALID_MESSAGE_MAX_NUMBER_OF_BYTES);
         System.out.println(binaryToString(binaryMessage));
-        binaryMessage = swapBits(binaryMessage, 0, 16);
+        binaryMessage = swapBits(binaryMessage, 0, 24);
         System.out.println(binaryToString(binaryMessage));
 
         return "toto";
@@ -106,7 +107,7 @@ public class DESAlgorithm
     }
     private static int calculateBitRelativeIndex(byte[] bytes, int absoluteIndex) throws DESAlgorithmException
     {
-        return absoluteIndex % bytes.length;
+        return 7 - (int)Math.floor(absoluteIndex % bytes.length);
     }
     private static int calculateByteIndex(byte[] bytes, int bitIndex) throws DESAlgorithmException
     {
@@ -168,13 +169,32 @@ public class DESAlgorithm
     }
     private static byte[] swapBits(byte[] bytes, int bit1Index, int bit2Index) throws DESAlgorithmException
     {
-        byte byte1;
-        byte byte2;
+        char            bit1Value;
+        char            bit2Value;
+        int             bit1RelativeIndex;
+        int             bit2RelativeIndex;
+        int             byte1Index;
+        int             byte2Index;
+        StringBuilder   byte1;
+        StringBuilder   byte2;
 
-        byte1 = findByte(bytes, bit1Index);
-        byte2 = findByte(bytes, bit2Index);
-        System.out.println("byte1: " + byteToString(byte1));
-        System.out.println("byte2: " + byteToString(byte2));
+        // Byte 1 data
+        byte1 = new StringBuilder(byteToString(findByte(bytes, bit1Index)));
+        byte1Index = calculateByteIndex(bytes, bit1Index);
+        bit1RelativeIndex = calculateBitRelativeIndex(bytes, bit1Index);
+        bit1Value = byte1.charAt(bit1RelativeIndex);
+
+        // Byte 2 data
+        byte2 = new StringBuilder(byteToString(findByte(bytes, bit2Index)));
+        byte2Index = calculateByteIndex(bytes, bit2Index);
+        bit2RelativeIndex = calculateBitRelativeIndex(bytes, bit2Index);
+        bit2Value = byte2.charAt(bit2RelativeIndex);
+
+        // Swap
+        byte1.setCharAt(bit1RelativeIndex, bit2Value);
+        byte2.setCharAt(bit2RelativeIndex, bit1Value);
+        bytes[byte1Index] = Byte.parseByte(byte1.toString(), 2);
+        bytes[byte2Index] = Byte.parseByte(byte2.toString(), 2);
         return bytes;
     }
     private static boolean validateKey(byte[] binaryKey) throws DESAlgorithmException
