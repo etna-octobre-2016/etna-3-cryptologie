@@ -46,11 +46,13 @@ public class DESAlgorithm
         validateMessage(binaryMessage);
 
         binaryMessage = padBinaryNumber(binaryMessage, VALID_MESSAGE_MAX_NUMBER_OF_BYTES);
+        // System.out.println(binaryToString(binaryMessage));
+        // binaryMessage = swapBits(binaryMessage, 0, 24);
         System.out.println(binaryToString(binaryMessage));
-        binaryMessage = swapBits(binaryMessage, 0, 24);
-        System.out.println(binaryToString(binaryMessage));
-        binaryMessage = shiftBinary(binaryMessage, 8);
-        System.out.println(binaryToString(binaryMessage));
+        binaryMessage = shiftBinary(binaryMessage, -24);
+        byte[] toto = shiftBinary(binaryMessage, -40);
+        // System.out.println(binaryToString(binaryMessage));
+        System.out.println(binaryToString(toto));
 
         return "toto";
     }
@@ -148,17 +150,29 @@ public class DESAlgorithm
         }
         return ArrayUtils.toPrimitive(bytesList.toArray(new Byte[numberOfBytes]));
     }
-    private static byte[]       shiftBinary(byte[] bytes, int count)
+    private static byte[]       shiftBinary(byte[] bytes, int count, boolean isCircular)
     {
         long        number;
         long        shiftedNumber;
         ByteBuffer  buffer;
 
         number = binaryToLong(bytes);
-        shiftedNumber = (count < 0) ? number >> (-count) : number << count;
+        if (isCircular)
+        {
+
+            shiftedNumber = (count < 0) ? (number >> (-count) | number << (Long.SIZE + count)) : (number << count | number >> (Long.SIZE - count));
+        }
+        else
+        {
+            shiftedNumber = (count < 0) ? number >> (-count) : number << count;
+        }
         buffer = ByteBuffer.allocate(bytes.length);
         buffer.putLong(shiftedNumber);
         return buffer.array();
+    }
+    private static byte[]       shiftBinary(byte[] bytes, int count)
+    {
+        return shiftBinary(bytes, count, true);
     }
     private static byte[]       stringToBinary(String str)
     {
