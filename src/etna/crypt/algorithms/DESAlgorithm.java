@@ -81,18 +81,27 @@ public class DESAlgorithm
         buffer = ByteBuffer.wrap(binaryData);
         return buffer.getLong();
     }
-    private static String       binaryToString(byte[] binaryData)
+    private static String       binaryToString(byte[] binaryData, char delimiter)
     {
+        int           i;
+        int           length;
         StringBuilder output;
 
+        length = binaryData.length;
         output = new StringBuilder();
-        for (byte b : binaryData)
+        for (i = 0; i < length; i++)
         {
-
-            output.append(byteToString(b));
-            output.append(" ");
+            output.append(byteToString(binaryData[i]));
+            if (i + 1 < length && delimiter != '\0')
+            {
+                output.append(delimiter);
+            }
         }
         return output.toString();
+    }
+    private static String       binaryToString(byte[] binaryData)
+    {
+        return binaryToString(binaryData, ' ');
     }
     private static String       byteToString(byte b)
     {
