@@ -101,7 +101,7 @@ public class DESAlgorithm
     }
     private static String       binaryToString(byte[] binaryData)
     {
-        return binaryToString(binaryData, ' ');
+        return binaryToString(binaryData, '\0');
     }
     private static String       byteToString(byte b)
     {
