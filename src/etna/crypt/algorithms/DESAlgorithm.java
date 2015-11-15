@@ -15,6 +15,7 @@ public class DESAlgorithm
     ////////////////////////////////////////////////////////////////////////
     // CONSTANTS
     ////////////////////////////////////////////////////////////////////////
+    private static int          ROUNDS = 16;
     private static int          VALID_KEY_NUMBER_OF_BYTES = 8;
     private static int          VALID_MESSAGE_MAX_NUMBER_OF_BYTES = 8;
 
@@ -36,14 +37,43 @@ public class DESAlgorithm
         binaryMessage = message.getBytes(Charset.forName("UTF-8"));
         validateKey(binaryKey);
         validateMessage(binaryMessage);
-        roundKey = KeySchedule(binaryKey, 1);
+        roundKey = KeySchedule(binaryKey, 6);
+        System.out.println(binaryToString(roundKey, ' '));
         return "toto";
     }
-    public static byte[]        KeySchedule(byte[] binaryKey, Integer round)
+    public static byte[]        KeySchedule(byte[] binaryKey, Integer round) throws DESAlgorithmException
     {
-        System.out.println("before pc1: " + binaryToString(binaryKey));
-        System.out.println("after pc1: " + binaryToString(processPC1(binaryKey)));
-        return binaryKey;
+        int     i;
+        String  key;
+        String  left;
+        String  right;
+
+        if (round < 1 || round > ROUNDS)
+        {
+            throw new DESAlgorithmException("not valid round number " + round);
+        }
+        binaryKey = processPC1(binaryKey);
+        key = binaryToString(binaryKey);
+        left = key.substring(0, 28);
+        right = key.substring(28);
+        for (i = 1; i < ROUNDS; i++)
+        {
+            if (i == 1 || i == 2 || i == 9 || i == 16)
+            {
+                left = shiftBinary(left, 1);
+                right = shiftBinary(right, 1);
+            }
+            else
+            {
+                left = shiftBinary(left, 2);
+                right = shiftBinary(right, 2);
+            }
+            if (i == round)
+            {
+                break;
+            }
+        }
+        return processPC2(stringToBinary(left + right));
     }
 
     ////////////////////////////////////////////////////////////////////////
@@ -191,6 +221,38 @@ public class DESAlgorithm
         outputList = Arrays.asList(ArrayUtils.toObject(stringToBinary(output)));
         return ArrayUtils.toPrimitive(outputList.toArray(new Byte[outputList.size()]));
     }
+    private static byte[]       processPC2(byte[] bytes)
+    {
+        int             i;
+        int             j;
+        int             tableLength;
+        int             tableRowLength;
+        int[]           tableRow;
+        int[][]         table = {
+            {14, 17, 11, 24, 1,  5,  3,  28},
+            {15, 6,  21, 10, 23, 19, 12, 4},
+            {26, 8,  16, 7,  27, 20, 13, 2},
+            {41, 52, 31, 37, 47, 55, 30, 40},
+            {51, 45, 33, 48, 44, 49, 39, 56},
+            {34, 53, 46, 42, 50, 36, 29, 32}
+        };
+        String          input;
+        StringBuilder   output;
+
+        input = binaryToString(bytes);
+        output = new StringBuilder();
+        tableLength = table.length;
+        for (i = 0; i < tableLength; i++)
+        {
+            tableRow = table[i];
+            tableRowLength = tableRow.length;
+            for (j = 0; j < tableRowLength; j++)
+            {
+                output.append(input.charAt(tableRow[j] - 1));
+            }
+        }
+        return stringToBinary(output.toString());
+    }
     private static byte[]       shiftBinary(byte[] bytes, int count, boolean isCircular)
     {
         long        number;
@@ -268,10 +330,23 @@ public class DESAlgorithm
     }
     private static byte[]       stringToBinary(String str)
     {
-        BigInteger number;
+        int         byteArrayLength;
+        int         numberOfBytes;
+        byte[]      byteArray;
+        BigInteger  number;
+        List<Byte>  subset;
 
         number = new BigInteger(str, 2);
-        return number.toByteArray();
+        numberOfBytes = (int)Math.ceil(str.length() / 8);
+        byteArray = number.toByteArray();
+        byteArrayLength = byteArray.length;
+        if (byteArrayLength > numberOfBytes)
+        {
+            subset = Arrays.asList(ArrayUtils.toObject(byteArray));
+            subset = subset.subList(byteArrayLength - numberOfBytes, subset.size());
+            byteArray = ArrayUtils.toPrimitive(subset.toArray(new Byte[numberOfBytes]));
+        }
+        return byteArray;
     }
     private static byte[]       swapBits(byte[] bytes, int bit1Index, int bit2Index) throws DESAlgorithmException
     {
