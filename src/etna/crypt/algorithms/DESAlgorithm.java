@@ -1,6 +1,7 @@
 package etna.crypt.algorithms;
 
 import java.lang.*;
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Arrays;
@@ -14,16 +15,6 @@ public class DESAlgorithm
     ////////////////////////////////////////////////////////////////////////
     // CONSTANTS
     ////////////////////////////////////////////////////////////////////////
-    private static int          IP_TABLE[][] = {
-        {58, 50, 42, 34, 26, 18, 10, 2},
-        {60, 52, 44, 36, 28, 20, 12, 4},
-        {62, 54, 46, 38, 30, 22, 14, 6},
-        {64, 56, 48, 40, 32, 24, 16, 8},
-        {57, 49, 41, 33, 25, 17, 9,  1},
-        {59, 51, 43, 35, 27, 19, 11, 3},
-        {61, 53, 45, 37, 29, 21, 13, 5},
-        {63, 55, 47, 39, 31, 23, 15, 7}
-    };
     private static int          VALID_KEY_NUMBER_OF_BYTES = 8;
     private static int          VALID_MESSAGE_MAX_NUMBER_OF_BYTES = 8;
 
@@ -39,34 +30,19 @@ public class DESAlgorithm
     {
         byte[] binaryKey;
         byte[] binaryMessage;
+        byte[] roundKey;
 
-        binaryKey = stringToBinary(key);
-        binaryMessage = stringToBinary(message);
+        binaryKey = key.getBytes(Charset.forName("UTF-8"));
+        binaryMessage = message.getBytes(Charset.forName("UTF-8"));
         validateKey(binaryKey);
         validateMessage(binaryMessage);
-
-        binaryMessage = padBinaryNumber(binaryMessage, VALID_MESSAGE_MAX_NUMBER_OF_BYTES);
-        // System.out.println(binaryToString(binaryMessage));
-        // binaryMessage = swapBits(binaryMessage, 0, 24);
-        System.out.println(binaryToString(binaryMessage));
-        binaryMessage = shiftBinary(binaryMessage, -24);
-        byte[] toto = shiftBinary(binaryMessage, -40);
-        // System.out.println(binaryToString(binaryMessage));
-        System.out.println(binaryToString(toto));
-
+        roundKey = KeySchedule(binaryKey, 1);
         return "toto";
     }
     public static byte[]        KeySchedule(byte[] binaryKey, Integer round)
     {
-        System.out.println("nombre d'octets: " + binaryKey.length);
-        System.out.println("nombre de bits: " + (binaryKey.length * 8));
-        System.out.println(binaryToString(binaryKey));
-        System.out.println(Long.toHexString(
-                binaryToLong(
-                    binaryKey
-                )
-            )
-        );
+        System.out.println("before pc1: " + binaryToString(binaryKey));
+        System.out.println("after pc1: " + binaryToString(processPC1(binaryKey)));
         return binaryKey;
     }
 
@@ -159,6 +135,63 @@ public class DESAlgorithm
         }
         return ArrayUtils.toPrimitive(bytesList.toArray(new Byte[numberOfBytes]));
     }
+    private static byte[]       processPC1(byte[] bytes)
+    {
+        byte[]          outputBinary;
+        int             i;
+        int             j;
+        int             lTableLength;
+        int             lTableRowLength;
+        int             rTableLength;
+        int             rTableRowLength;
+        int[]           lTableRow;
+        int[]           rTableRow;
+        int[][]         lTable = {
+            {57, 49, 41, 33, 25, 17, 9},
+            {1,  58, 50, 42, 34, 26, 18},
+            {10, 2,  59, 51, 43, 35, 27},
+            {19, 11, 3,  60, 52, 44, 36}
+        };
+        int[][]         rTable = {
+            {63, 55, 47, 39, 31, 23, 15},
+            {7,  62, 54, 46, 38, 30, 22},
+            {14, 6,  61, 53, 45, 37, 29},
+            {21, 13, 5,  28, 20, 12, 4}
+        };
+        List<Byte>      outputList;
+        String          input;
+        String          output;
+        StringBuilder   lOutput;
+        StringBuilder   rOutput;
+
+        input = binaryToString(bytes);
+        lTableLength = lTable.length;
+        lOutput = new StringBuilder();
+        for (i = 0; i < lTableLength; i++)
+        {
+            lTableRow = lTable[i];
+            lTableRowLength = lTableRow.length;
+            for (j = 0; j < lTableRowLength; j++)
+            {
+                lOutput.append(input.charAt(lTableRow[j] - 1));
+            }
+        }
+        rTableLength = rTable.length;
+        rOutput = new StringBuilder();
+        for (i = 0; i < rTableLength; i++)
+        {
+            rTableRow = rTable[i];
+            rTableRowLength = rTableRow.length;
+            for (j = 0; j < rTableRowLength; j++)
+            {
+                rOutput.append(input.charAt(rTableRow[j] - 1));
+            }
+        }
+        output = lOutput.toString() + rOutput.toString();
+        outputList = Arrays.asList(ArrayUtils.toObject(stringToBinary(output)));
+        outputList = outputList.subList(1, outputList.size());
+        return ArrayUtils.toPrimitive(outputList.toArray(new Byte[outputList.size()]));
+    }
     private static byte[]       shiftBinary(byte[] bytes, int count, boolean isCircular)
     {
         long        number;
@@ -185,7 +218,10 @@ public class DESAlgorithm
     }
     private static byte[]       stringToBinary(String str)
     {
-        return str.getBytes(Charset.forName("UTF-8"));
+        BigInteger number;
+
+        number = new BigInteger(str, 2);
+        return number.toByteArray();
     }
     private static byte[]       swapBits(byte[] bytes, int bit1Index, int bit2Index) throws DESAlgorithmException
     {
