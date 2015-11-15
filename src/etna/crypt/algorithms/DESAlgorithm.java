@@ -189,7 +189,6 @@ public class DESAlgorithm
         }
         output = lOutput.toString() + rOutput.toString();
         outputList = Arrays.asList(ArrayUtils.toObject(stringToBinary(output)));
-        outputList = outputList.subList(1, outputList.size());
         return ArrayUtils.toPrimitive(outputList.toArray(new Byte[outputList.size()]));
     }
     private static byte[]       shiftBinary(byte[] bytes, int count, boolean isCircular)
