@@ -215,6 +215,53 @@ public class DESAlgorithm
     {
         return shiftBinary(bytes, count, true);
     }
+    private static String       shiftBinary(String str, int count, boolean isCircular)
+    {
+        int           length;
+        int           outputLength;
+        StringBuilder output;
+
+        length = str.length();
+        output = new StringBuilder();
+        if (isCircular)
+        {
+            if (count < 0)
+            {
+                output.append(str.substring(length + count));
+                output.append(str.substring(0, length + count));
+            }
+            else
+            {
+                output.append(str.substring(count));
+                output.append(str.substring(0, count));
+            }
+        }
+        else
+        {
+            if (count < 0)
+            {
+                output.append(str.substring(0, length + count));
+            }
+            else
+            {
+                output.append(str.substring(count));
+            }
+            outputLength = output.length();
+            while (outputLength < length)
+            {
+                if (count < 0)
+                {
+                    output.insert(0, '0');
+                }
+                else
+                {
+                    output.append('0');
+                }
+                outputLength++;
+            }
+        }
+        return output.toString();
+    }
     private static byte[]       stringToBinary(String str)
     {
         BigInteger number;
