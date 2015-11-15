@@ -262,6 +262,10 @@ public class DESAlgorithm
         }
         return output.toString();
     }
+    private static String       shiftBinary(String str, int count)
+    {
+        return shiftBinary(str, count, true);
+    }
     private static byte[]       stringToBinary(String str)
     {
         BigInteger number;
