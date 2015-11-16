@@ -226,6 +226,7 @@ public class DESAlgorithm
     private static byte[]       processPC2(byte[] bytes)
     {
         int             i;
+        int             inputLength;
         int             j;
         int             tableLength;
         int             tableRowLength;
@@ -242,6 +243,7 @@ public class DESAlgorithm
         StringBuilder   output;
 
         input = binaryToString(bytes);
+        inputLength = input.length();
         output = new StringBuilder();
         tableLength = table.length;
         for (i = 0; i < tableLength; i++)
@@ -250,7 +252,7 @@ public class DESAlgorithm
             tableRowLength = tableRow.length;
             for (j = 0; j < tableRowLength; j++)
             {
-                output.append(input.charAt(tableRow[j] - 1));
+                output.append(input.charAt(inputLength - tableRow[j]));
             }
         }
         return stringToBinary(output.toString());
