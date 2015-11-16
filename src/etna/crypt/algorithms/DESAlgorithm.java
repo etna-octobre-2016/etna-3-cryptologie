@@ -59,9 +59,6 @@ public class DESAlgorithm
             throw new DESAlgorithmException("not valid round number " + round);
         }
         binaryKey = processPC1(binaryKey);
-
-        System.out.println("PC1:\t" + binaryToString(binaryKey, ' '));
-
         key = binaryToString(binaryKey);
         left = key.substring(0, 28);
         right = key.substring(28);
