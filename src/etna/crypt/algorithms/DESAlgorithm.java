@@ -169,6 +169,7 @@ public class DESAlgorithm
     {
         byte[]          outputBinary;
         int             i;
+        int             inputLength;
         int             j;
         int             lTableLength;
         int             lTableRowLength;
@@ -195,6 +196,7 @@ public class DESAlgorithm
         StringBuilder   rOutput;
 
         input = binaryToString(bytes);
+        inputLength = input.length();
         lTableLength = lTable.length;
         lOutput = new StringBuilder();
         for (i = 0; i < lTableLength; i++)
@@ -203,7 +205,7 @@ public class DESAlgorithm
             lTableRowLength = lTableRow.length;
             for (j = 0; j < lTableRowLength; j++)
             {
-                lOutput.append(input.charAt(lTableRow[j] - 1));
+                lOutput.append(input.charAt(inputLength - lTableRow[j]));
             }
         }
         rTableLength = rTable.length;
@@ -214,7 +216,7 @@ public class DESAlgorithm
             rTableRowLength = rTableRow.length;
             for (j = 0; j < rTableRowLength; j++)
             {
-                rOutput.append(input.charAt(rTableRow[j] - 1));
+                rOutput.append(input.charAt(inputLength - rTableRow[j]));
             }
         }
         output = lOutput.toString() + rOutput.toString();
