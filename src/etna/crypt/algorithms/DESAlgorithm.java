@@ -31,14 +31,20 @@ public class DESAlgorithm
     {
         byte[] binaryKey;
         byte[] binaryMessage;
+        byte[] binaryMessageIP;
         byte[] roundKey;
 
         binaryKey = key.getBytes(Charset.forName("UTF-8"));
-        binaryMessage = message.getBytes(Charset.forName("UTF-8"));
+        binaryMessage = padBinaryNumber(message.getBytes(Charset.forName("UTF-8")), VALID_MESSAGE_MAX_NUMBER_OF_BYTES);
         validateKey(binaryKey);
         validateMessage(binaryMessage);
-        roundKey = KeySchedule(binaryKey, 6);
-        System.out.println(binaryToString(roundKey, ' '));
+
+        System.out.println("P:\t" + binaryToString(binaryMessage, ' '));
+
+        binaryMessageIP = processIP(binaryMessage);
+
+        System.out.println("IP:\t" + binaryToString(binaryMessageIP, ' '));
+
         return "toto";
     }
     public static byte[]        KeySchedule(byte[] binaryKey, Integer round) throws DESAlgorithmException
@@ -53,6 +59,9 @@ public class DESAlgorithm
             throw new DESAlgorithmException("not valid round number " + round);
         }
         binaryKey = processPC1(binaryKey);
+
+        System.out.println("PC1:\t" + binaryToString(binaryKey, ' '));
+
         key = binaryToString(binaryKey);
         left = key.substring(0, 28);
         right = key.substring(28);
@@ -164,6 +173,42 @@ public class DESAlgorithm
             numberOfBytes++;
         }
         return ArrayUtils.toPrimitive(bytesList.toArray(new Byte[numberOfBytes]));
+    }
+    private static byte[]       processIP(byte[] bytes)
+    {
+        int             i;
+        int             inputLength;
+        int             j;
+        int             tableLength;
+        int             tableRowLength;
+        int[]           tableRow;
+        int[][]         table = {
+            {58, 50, 42, 34, 26, 18, 10, 2},
+            {60, 52, 44, 36, 28, 20, 12, 4},
+            {62, 54, 46, 38, 30, 22, 14, 6},
+            {64, 56, 48, 40, 32, 24, 16, 8},
+            {57, 49, 41, 33, 25, 17, 9,  1},
+            {59, 51, 43, 35, 27, 19, 11, 3},
+            {61, 53, 45, 37, 29, 21, 13, 5},
+            {63, 55, 47, 39, 31, 23, 15, 7}
+        };
+        String          input;
+        StringBuilder   output;
+
+        input = binaryToString(bytes);
+        inputLength = input.length();
+        output = new StringBuilder();
+        tableLength = table.length;
+        for (i = 0; i < tableLength; i++)
+        {
+            tableRow = table[i];
+            tableRowLength = tableRow.length;
+            for (j = 0; j < tableRowLength; j++)
+            {
+                output.append(input.charAt(inputLength - tableRow[j]));
+            }
+        }
+        return stringToBinary(output.toString());
     }
     private static byte[]       processPC1(byte[] bytes)
     {
