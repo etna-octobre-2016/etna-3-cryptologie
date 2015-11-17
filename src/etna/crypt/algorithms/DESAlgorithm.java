@@ -175,7 +175,7 @@ public class DESAlgorithm
         }
         return ArrayUtils.toPrimitive(bytesList.toArray(new Byte[numberOfBytes]));
     }
-    private static byte[]       processE(byte[] bytes)
+    private static byte[]       processE(byte[] bytes) throws DESAlgorithmException
     {
         int             i;
         int             inputLength;
@@ -196,6 +196,10 @@ public class DESAlgorithm
         String          input;
         StringBuilder   output;
 
+        if (bytes.length != 4)
+        {
+            throw new DESAlgorithmException("Invalid E input. Must be 32 bits long. Number of bits provided: " + (bytes.length * 8));
+        }
         input = binaryToString(bytes);
         inputLength = input.length();
         output = new StringBuilder();
