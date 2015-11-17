@@ -211,7 +211,7 @@ public class DESAlgorithm
         }
         return stringToBinary(output.toString());
     }
-    private static byte[]       processFP(byte[] bytes)
+    private static byte[]       processFP(byte[] bytes) throws DESAlgorithmException
     {
         int             i;
         int             inputLength;
@@ -232,6 +232,10 @@ public class DESAlgorithm
         String          input;
         StringBuilder   output;
 
+        if (bytes.length != 8)
+        {
+            throw new DESAlgorithmException("Invalid FP input. Must be 64 bits long. Number of bits provided: " + (bytes.length * 8));
+        }
         input = binaryToString(bytes);
         inputLength = input.length();
         output = new StringBuilder();
