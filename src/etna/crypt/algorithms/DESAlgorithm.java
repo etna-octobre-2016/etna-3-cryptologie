@@ -247,7 +247,7 @@ public class DESAlgorithm
         }
         return stringToBinary(output.toString());
     }
-    private static byte[]       processIP(byte[] bytes)
+    private static byte[]       processIP(byte[] bytes) throws DESAlgorithmException
     {
         int             i;
         int             inputLength;
@@ -268,6 +268,10 @@ public class DESAlgorithm
         String          input;
         StringBuilder   output;
 
+        if (bytes.length != 8)
+        {
+            throw new DESAlgorithmException("Invalid IP input. Must be 64 bits long. Number of bits provided: " + (bytes.length * 8));
+        }
         input = binaryToString(bytes);
         inputLength = input.length();
         output = new StringBuilder();
