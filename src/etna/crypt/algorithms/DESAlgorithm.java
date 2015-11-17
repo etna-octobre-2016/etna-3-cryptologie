@@ -345,7 +345,7 @@ public class DESAlgorithm
         outputList = Arrays.asList(ArrayUtils.toObject(stringToBinary(output)));
         return ArrayUtils.toPrimitive(outputList.toArray(new Byte[outputList.size()]));
     }
-    private static byte[]       processPC2(byte[] bytes)
+    private static byte[]       processPC2(byte[] bytes) throws DESAlgorithmException
     {
         int             i;
         int             inputLength;
@@ -364,6 +364,10 @@ public class DESAlgorithm
         String          input;
         StringBuilder   output;
 
+        if (bytes.length != 7)
+        {
+            throw new DESAlgorithmException("Invalid PC2 input. Must be 56 bits long. Number of bits provided: " + (bytes.length * 8));
+        }
         input = binaryToString(bytes);
         inputLength = input.length();
         output = new StringBuilder();
