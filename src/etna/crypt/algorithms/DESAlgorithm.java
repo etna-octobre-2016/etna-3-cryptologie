@@ -295,6 +295,42 @@ public class DESAlgorithm
         }
         return stringToBinary(output.toString());
     }
+    private static byte[]       processP(byte[] bytes) throws DESAlgorithmException
+    {
+        int             i;
+        int             inputLength;
+        int             j;
+        int             tableLength;
+        int             tableRowLength;
+        int[]           tableRow;
+        int[][]         table = {
+            {16, 7,  20, 21, 29, 12, 28, 17},
+            {1,  15, 23, 26, 5,  18, 31, 10},
+            {2,  8,  24, 14, 32, 27, 3,  9},
+            {19, 13, 30, 6,  22, 11, 4,  25}
+        };
+        String          input;
+        StringBuilder   output;
+
+        if (bytes.length != 4)
+        {
+            throw new DESAlgorithmException("Invalid P input. Must be 32 bits long. Number of bits provided: " + (bytes.length * 8));
+        }
+        input = binaryToString(bytes);
+        inputLength = input.length();
+        output = new StringBuilder();
+        tableLength = table.length;
+        for (i = 0; i < tableLength; i++)
+        {
+            tableRow = table[i];
+            tableRowLength = tableRow.length;
+            for (j = 0; j < tableRowLength; j++)
+            {
+                output.append(input.charAt(inputLength - tableRow[j]));
+            }
+        }
+        return stringToBinary(output.toString());
+    }
     private static byte[]       processPC1(byte[] bytes) throws DESAlgorithmException
     {
         byte[]          outputBinary;
