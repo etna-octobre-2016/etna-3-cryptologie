@@ -283,7 +283,7 @@ public class DESAlgorithm
         }
         return stringToBinary(output.toString());
     }
-    private static byte[]       processPC1(byte[] bytes)
+    private static byte[]       processPC1(byte[] bytes) throws DESAlgorithmException
     {
         byte[]          outputBinary;
         int             i;
@@ -313,6 +313,10 @@ public class DESAlgorithm
         StringBuilder   lOutput;
         StringBuilder   rOutput;
 
+        if (bytes.length != 8)
+        {
+            throw new DESAlgorithmException("Invalid PC1 input. Must be 64 bits long. Number of bits provided: " + (bytes.length * 8));
+        }
         input = binaryToString(bytes);
         inputLength = input.length();
         lTableLength = lTable.length;
