@@ -49,6 +49,8 @@ public class DESAlgorithm
 
         System.out.println("output:\t" + new String(processFP(binaryMessageIP), Charset.forName("UTF-8")));
 
+        System.out.println("S5:\t" + processS5("110000"));
+
         return "toto";
     }
     public static byte[]        KeySchedule(byte[] binaryKey, Integer round) throws DESAlgorithmException
@@ -352,6 +354,16 @@ public class DESAlgorithm
         }
         return permutate(bytes, table);
     }
+    private static String       processS5(String binaryString) throws DESAlgorithmException
+    {
+        int[][] table = {
+            {2,  12, 4,  1,  7,  10, 11, 6,  8,  5,  3,  15, 13, 0,  14, 9},
+            {14, 11, 2,  12, 4,  7,  13, 1,  5,  0,  15, 10, 3,  9,  8,  6},
+            {4,  2,  1,  11, 10, 13, 7,  8,  15, 9,  12, 5,  6,  3,  0,  14},
+            {11, 8,  12, 7,  1,  14, 2,  13, 6,  15, 0,  9,  10, 4,  5,  3}
+        };
+        return substitute(binaryString, table);
+    }
     private static byte[]       shiftBinary(byte[] bytes, int count, boolean isCircular)
     {
         long        number;
@@ -446,6 +458,51 @@ public class DESAlgorithm
             byteArray = ArrayUtils.toPrimitive(subset.toArray(new Byte[numberOfBytes]));
         }
         return byteArray;
+    }
+    private static String       substitute(String binaryString, int[][] table) throws DESAlgorithmException
+    {
+        int     binaryStringLength;
+        int     col;
+        int     i;
+        int     j;
+        int     outputLength;
+        int     row;
+        int     tableLength;
+        int     tableRowLength;
+        String  output;
+
+        binaryStringLength = binaryString.length();
+        if (binaryStringLength != 6)
+        {
+            throw new DESAlgorithmException("Invalid number of bits. Number of bits required: 6");
+        }
+        col = Integer.parseInt(binaryString.substring(1, 5), 2);
+        row = Integer.parseInt("" + binaryString.charAt(0) + binaryString.charAt(5), 2);
+        output = "";
+        tableLength = table.length;
+        outerloop:
+        for (i = 0; i < tableLength; i++)
+        {
+            if (i == row)
+            {
+                tableRowLength = table[i].length;
+                for (j = 0; j < tableRowLength; j++)
+                {
+                    if (j == col)
+                    {
+                        output = Integer.toBinaryString(table[i][j]);
+                        break outerloop;
+                    }
+                }
+            }
+        }
+        outputLength = output.length();
+        while (outputLength < 4)
+        {
+            output = "0" + output;
+            outputLength++;
+        }
+        return output;
     }
     private static byte[]       swapBits(byte[] bytes, int bit1Index, int bit2Index) throws DESAlgorithmException
     {
