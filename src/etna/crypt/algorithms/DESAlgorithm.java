@@ -32,6 +32,7 @@ public class DESAlgorithm
         byte[] binaryKey;
         byte[] binaryMessage;
         byte[] binaryMessageIP;
+        byte[] feistelResult;
         byte[] roundKey;
 
         binaryKey = key.getBytes(Charset.forName("UTF-8"));
@@ -50,6 +51,8 @@ public class DESAlgorithm
         System.out.println("output:\t" + new String(processFP(binaryMessageIP), Charset.forName("UTF-8")));
 
         System.out.println("S5:\t" + processS5("110000"));
+
+        feistelResult = processFeistel(Arrays.copyOfRange(binaryMessageIP, 0, 4), KeySchedule(binaryKey, 1));
 
         return "toto";
     }
@@ -94,10 +97,7 @@ public class DESAlgorithm
 
     private static long         binaryToLong(byte[] binaryData)
     {
-        ByteBuffer buffer;
-
-        buffer = ByteBuffer.wrap(binaryData);
-        return buffer.getLong();
+        return Long.parseLong(binaryToString(binaryData), 2);
     }
     private static String       binaryToString(byte[] binaryData, char delimiter)
     {
@@ -221,6 +221,19 @@ public class DESAlgorithm
             throw new DESAlgorithmException("Invalid E input. Must be 32 bits long. Number of bits provided: " + (bytes.length * 8));
         }
         return padBinaryNumber(permutate(bytes, table), 6);
+    }
+    private static byte[]       processFeistel(byte[] halfBlockBytes, byte[] subKeyBytes) throws DESAlgorithmException
+    {
+        long    halfBlock;
+        long    subKey;
+        String  xorResultString;
+
+        halfBlockBytes = padBinaryNumber(processE(halfBlockBytes), 6);
+        halfBlock = binaryToLong(halfBlockBytes);
+        subKey = binaryToLong(subKeyBytes);
+        xorResultString = Long.toUnsignedString((halfBlock ^ subKey), 2);
+
+        return halfBlockBytes;
     }
     private static byte[]       processFP(byte[] bytes) throws DESAlgorithmException
     {
