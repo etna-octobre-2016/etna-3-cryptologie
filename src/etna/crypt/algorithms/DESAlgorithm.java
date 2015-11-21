@@ -27,11 +27,21 @@ public class DESAlgorithm
     public static byte[]        DESencrypt(byte[] message, byte[] key) throws DESAlgorithmException
     {
         byte[] ipResult;
+        byte[] leftBlock;
+        byte[] rightBlock;
 
         message = padBinary(message, VALID_MESSAGE_NUMBER_OF_BYTES);
-        ipResult = processIP(message);
         System.out.println("Plain:\t" + binaryToString(message, ' '));
+
+        // IP
+        ipResult = processIP(message);
         System.out.println("IP:\t" + binaryToString(ipResult, ' '));
+
+        // Left / right split
+        leftBlock = Arrays.copyOfRange(ipResult, 0, 4);
+        rightBlock = Arrays.copyOfRange(ipResult, 4, 8);
+        System.out.println("L:\t" + binaryToString(leftBlock, ' '));
+        System.out.println("R:\t" + binaryToString(rightBlock, ' '));
 
         return new byte[0];
     }
