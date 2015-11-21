@@ -220,7 +220,7 @@ public class DESAlgorithm
         {
             throw new DESAlgorithmException("Invalid E input. Must be 32 bits long. Number of bits provided: " + (bytes.length * 8));
         }
-        return permutate(bytes, table);
+        return padBinaryNumber(permutate(bytes, table), 6);
     }
     private static byte[]       processFP(byte[] bytes) throws DESAlgorithmException
     {
