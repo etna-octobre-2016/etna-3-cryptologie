@@ -572,7 +572,7 @@ public class DESAlgorithm
         }
         return parts;
     }
-    public static byte[]       stringToBinary(String str)
+    private static byte[]       stringToBinary(String str)
     {
         int         byteArrayLength;
         int         numberOfBytes;
