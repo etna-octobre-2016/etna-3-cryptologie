@@ -30,32 +30,55 @@ public class DESAlgorithm
     }
     public static String        DESencrypt(String message, String key) throws DESAlgorithmException
     {
-        byte[] binaryKey;
-        byte[] binaryMessage;
-        byte[] binaryMessageIP;
-        byte[] feistelResult;
-        byte[] roundKey;
+        byte[]  binaryKey;
+        byte[]  binaryMessage;
+        byte[]  binaryMessageIP;
+        byte[]  leftBlock;
+        byte[]  rightBlock;
+        byte[]  roundKey;
+        byte[]  cipherMessage;
+        int     i;
+        int     leftBlockInt;
+        int     rightBlockInt;
+        int     round;
 
         binaryKey = key.getBytes(Charset.forName("UTF-8"));
         binaryMessage = padBinaryNumber(message.getBytes(Charset.forName("UTF-8")), VALID_MESSAGE_MAX_NUMBER_OF_BYTES);
         validateKey(binaryKey);
         validateMessage(binaryMessage);
 
-        System.out.println("P:\t" + binaryToString(binaryMessage, ' '));
-
+        // IP permutation
         binaryMessageIP = processIP(binaryMessage);
 
-        System.out.println("IP:\t" + binaryToString(binaryMessageIP, ' '));
+        // Left / right split
+        leftBlock = Arrays.copyOfRange(binaryMessageIP, 0, 4);
+        rightBlock = Arrays.copyOfRange(binaryMessageIP, 4, 8);
 
-        System.out.println("FP:\t" + binaryToString(padBinaryNumber(processFP(binaryMessageIP), VALID_MESSAGE_MAX_NUMBER_OF_BYTES), ' '));
+        // For each round
+        for (i = 0; i < ROUNDS; i++)
+        {
+            round = i + 1;
 
-        System.out.println("output:\t" + new String(processFP(binaryMessageIP), Charset.forName("UTF-8")));
+            // Feistel + XOR
+            leftBlockInt = binaryToInt(leftBlock);
+            rightBlockInt = binaryToInt(processFeistel(rightBlock, KeySchedule(binaryKey, round)));
+            leftBlockInt = leftBlockInt ^ rightBlockInt;
 
-        System.out.println("S5:\t" + processS5("110000"));
+            // Swap
+            if (round < ROUNDS)
+            {
+                leftBlock = rightBlock;
+                rightBlock = intToBinary(leftBlockInt);
+            }
 
-        feistelResult = processFeistel(Arrays.copyOfRange(binaryMessageIP, 0, 4), KeySchedule(binaryKey, 1));
-
-        return "toto";
+            // Concatenation + Final permutation
+            else
+            {
+                cipherMessage = processFP(ArrayUtils.addAll(leftBlock, rightBlock));
+                return new String(cipherMessage);
+            }
+        }
+        throw new DESAlgorithmException("error during encryption");
     }
     public static byte[]        KeySchedule(byte[] binaryKey, Integer round) throws DESAlgorithmException
     {
@@ -96,9 +119,13 @@ public class DESAlgorithm
     // PRIVATE STATIC METHODS
     ////////////////////////////////////////////////////////////////////////
 
+    private static int          binaryToInt(byte[] binaryData)
+    {
+        return Integer.parseUnsignedInt(binaryToString(binaryData), 2);
+    }
     private static long         binaryToLong(byte[] binaryData)
     {
-        return Long.parseLong(binaryToString(binaryData), 2);
+        return Long.parseUnsignedLong(binaryToString(binaryData), 2);
     }
     private static String       binaryToString(byte[] binaryData, char delimiter)
     {
@@ -161,6 +188,10 @@ public class DESAlgorithm
 
         byteIndex = calculateByteIndex(bytes, bitIndex);
         return bytes[byteIndex];
+    }
+    private static byte[]       intToBinary(int number)
+    {
+        return ByteBuffer.allocate(4).putInt(number).array();
     }
     private static byte[]       padBinaryNumber(byte[] number, int maxLength)
     {

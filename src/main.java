@@ -7,7 +7,8 @@ class Main
         try
         {
             System.out.println("Hello World! My name is Said AHEMT"); // Display the string
-            DESAlgorithm.DESencrypt(" A  Z", "hello wd");
+
+            System.out.println("cypher: " + DESAlgorithm.DESencrypt("ABCDEFGH", "12345678"));
         }
         catch (DESAlgorithmException e)
         {
