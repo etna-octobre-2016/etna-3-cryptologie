@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 
 public class DESAlgorithm
 {
@@ -231,7 +232,9 @@ public class DESAlgorithm
         halfBlockBytes = padBinaryNumber(processE(halfBlockBytes), 6);
         halfBlock = binaryToLong(halfBlockBytes);
         subKey = binaryToLong(subKeyBytes);
-        xorResultString = Long.toUnsignedString((halfBlock ^ subKey), 2);
+        xorResultString = StringUtils.leftPad(Long.toUnsignedString((halfBlock ^ subKey), 2), 48, "0");
+
+        System.out.println("xorResultString: " + xorResultString);
 
         return halfBlockBytes;
     }
