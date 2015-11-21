@@ -225,18 +225,26 @@ public class DESAlgorithm
     }
     private static byte[]       processFeistel(byte[] halfBlockBytes, byte[] subKeyBytes) throws DESAlgorithmException
     {
-        long    halfBlock;
-        long    subKey;
-        String  xorResultString;
+        byte[]          sOutput;
+        int             i;
+        int             sBlocksSize;
+        long            halfBlock;
+        long            subKey;
+        List<String>    sBlocks;
+        String          xorResultString;
 
         halfBlockBytes = padBinaryNumber(processE(halfBlockBytes), 6);
         halfBlock = binaryToLong(halfBlockBytes);
         subKey = binaryToLong(subKeyBytes);
         xorResultString = StringUtils.leftPad(Long.toUnsignedString((halfBlock ^ subKey), 2), 48, "0");
-
-        System.out.println("xorResultString: " + xorResultString);
-
-        return halfBlockBytes;
+        sBlocks = splitString(xorResultString, 6);
+        sBlocksSize = sBlocks.size();
+        for (i = 0; i < sBlocksSize; i++)
+        {
+            sBlocks.set(i, processS(sBlocks.get(i), (i + 1)));
+        }
+        sOutput = padBinaryNumber(stringToBinary(String.join("", sBlocks)), 4);
+        return processP(sOutput);
     }
     private static byte[]       processFP(byte[] bytes) throws DESAlgorithmException
     {
@@ -369,6 +377,30 @@ public class DESAlgorithm
             throw new DESAlgorithmException("Invalid PC2 input. Must be 56 bits long. Number of bits provided: " + (bytes.length * 8));
         }
         return permutate(bytes, table);
+    }
+    private static String       processS(String binaryString, int sBoxID) throws DESAlgorithmException
+    {
+        switch (sBoxID)
+        {
+            case 1:
+                return processS1(binaryString);
+            case 2:
+                return processS2(binaryString);
+            case 3:
+                return processS3(binaryString);
+            case 4:
+                return processS4(binaryString);
+            case 5:
+                return processS5(binaryString);
+            case 6:
+                return processS6(binaryString);
+            case 7:
+                return processS7(binaryString);
+            case 8:
+                return processS8(binaryString);
+            default:
+                throw new DESAlgorithmException("unexpected sBoxID '" + sBoxID + "'");
+        }
     }
     private static String       processS1(String binaryString) throws DESAlgorithmException
     {
@@ -524,6 +556,20 @@ public class DESAlgorithm
     private static String       shiftBinary(String str, int count)
     {
         return shiftBinary(str, count, true);
+    }
+    private static List<String> splitString(String string, int partitionSize)
+    {
+        int             i;
+        int             len;
+        List<String>    parts;
+
+        parts = new ArrayList<String>();
+        len = string.length();
+        for (i = 0; i < len; i += partitionSize)
+        {
+            parts.add(string.substring(i, Math.min(len, i + partitionSize)));
+        }
+        return parts;
     }
     private static byte[]       stringToBinary(String str)
     {
